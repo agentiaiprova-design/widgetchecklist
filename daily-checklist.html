@@ -9,8 +9,8 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
-      background: #111;
-      color: #e8e8e8;
+      background: #fff;
+      color: #111;
       min-height: 100vh;
       display: flex;
       align-items: flex-start;
@@ -34,13 +34,13 @@
       font-size: 0.68rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #444;
+      color: #999;
     }
 
     .progress-label {
       font-size: 0.68rem;
       letter-spacing: 0.12em;
-      color: #333;
+      color: #bbb;
     }
 
     /* Task list */
@@ -63,20 +63,20 @@
       align-items: center;
       gap: 14px;
       padding: 11px 0;
-      border-bottom: 1px solid #1c1c1c;
+      border-bottom: 1px solid #eee;
       cursor: pointer;
       user-select: none;
       transition: opacity 0.2s;
     }
 
     .task-item:last-child { border-bottom: none; }
-    .task-item:hover { opacity: 0.85; }
+    .task-item:hover { opacity: 0.65; }
 
     .circle {
-      width: 19px;
-      height: 19px;
-      border-radius: 50%;
-      border: 1.5px solid #333;
+      width: 17px;
+      height: 17px;
+      border-radius: 3px;
+      border: 1.5px solid #ccc;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -85,8 +85,8 @@
     }
 
     .task-item.done .circle {
-      border-color: #86efac;
-      background: #86efac;
+      border-color: #111;
+      background: #111;
     }
 
     .check-svg {
@@ -98,22 +98,22 @@
 
     .task-text {
       font-size: 0.93rem;
-      color: #d8d8d8;
+      color: #111;
       flex: 1;
       line-height: 1.4;
       transition: color 0.25s;
     }
 
     .task-item.done .task-text {
-      color: #333;
+      color: #bbb;
       text-decoration: line-through;
-      text-decoration-color: #333;
+      text-decoration-color: #bbb;
     }
 
     /* Empty state */
     .empty-state {
       padding: 20px 0 12px;
-      color: #2e2e2e;
+      color: #ccc;
       font-size: 0.85rem;
       letter-spacing: 0.06em;
     }
@@ -123,36 +123,36 @@
       display: flex;
       align-items: center;
       gap: 0;
-      border-bottom: 1px solid #222;
+      border-bottom: 1px solid #ddd;
       padding-bottom: 8px;
       transition: border-color 0.25s;
     }
 
-    .input-row:focus-within { border-color: #86efac; }
+    .input-row:focus-within { border-color: #111; }
 
     .task-input {
       flex: 1;
       background: none;
       border: none;
       outline: none;
-      color: #e8e8e8;
+      color: #111;
       font-family: inherit;
       font-size: 0.9rem;
       padding: 4px 0;
-      caret-color: #86efac;
+      caret-color: #111;
     }
 
-    .task-input::placeholder { color: #2e2e2e; }
+    .task-input::placeholder { color: #ccc; }
 
     .add-btn {
       background: none;
       border: none;
-      color: #86efac;
+      color: #111;
       font-size: 1.35rem;
       line-height: 1;
       cursor: pointer;
       padding: 2px 4px;
-      opacity: 0.5;
+      opacity: 0.25;
       transition: opacity 0.2s;
       flex-shrink: 0;
     }
@@ -183,14 +183,14 @@
 
     .done-title {
       font-size: 1rem;
-      color: #86efac;
+      color: #111;
       letter-spacing: 0.12em;
       margin-bottom: 8px;
     }
 
     .done-sub {
       font-size: 0.72rem;
-      color: #333;
+      color: #bbb;
       letter-spacing: 0.18em;
       text-transform: uppercase;
     }
@@ -285,7 +285,7 @@
         el.innerHTML = `
           <div class="circle">
             <svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"
-              stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="1.5,5 4,7.5 8.5,2"/>
             </svg>
           </div>
