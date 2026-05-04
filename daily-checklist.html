@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Goals</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+      background: #111;
+      color: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .date-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #444;
+    }
+
+    .progress-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: #333;
+    }
+
+    /* Task list */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 24px;
+      transition: opacity 0.35s;
+    }
+
+    .task-list.fading {
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid #1c1c1c;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+
+    .task-item:last-child { border-bottom: none; }
+    .task-item:hover { opacity: 0.85; }
+
+    .circle {
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      border: 1.5px solid #333;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.25s, background 0.25s;
+    }
+
+    .task-item.done .circle {
+      border-color: #86efac;
+      background: #86efac;
+    }
+
+    .check-svg {
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .task-item.done .check-svg { opacity: 1; }
+
+    .task-text {
+      font-size: 0.93rem;
+      color: #d8d8d8;
+      flex: 1;
+      line-height: 1.4;
+      transition: color 0.25s;
+    }
+
+    .task-item.done .task-text {
+      color: #333;
+      text-decoration: line-through;
+      text-decoration-color: #333;
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 20px 0 12px;
+      color: #2e2e2e;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* Input row */
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border-bottom: 1px solid #222;
+      padding-bottom: 8px;
+      transition: border-color 0.25s;
+    }
+
+    .input-row:focus-within { border-color: #86efac; }
+
+    .task-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: #e8e8e8;
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 4px 0;
+      caret-color: #86efac;
+    }
+
+    .task-input::placeholder { color: #2e2e2e; }
+
+    .add-btn {
+      background: none;
+      border: none;
+      color: #86efac;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 2px 4px;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+
+    .add-btn:hover { opacity: 1; }
+
+    /* Done message */
+    .done-screen {
+      display: none;
+      text-align: center;
+      padding: 48px 0 32px;
+    }
+
+    .done-screen.visible {
+      display: block;
+      animation: fadeUp 0.5s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .done-icon {
+      font-size: 2rem;
+      margin-bottom: 14px;
+    }
+
+    .done-title {
+      font-size: 1rem;
+      color: #86efac;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+
+    .done-sub {
+      font-size: 0.72rem;
+      color: #333;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <span class="date-label" id="dateLabel"></span>
+    <span class="progress-label" id="progressLabel"></span>
+  </div>
+
+  <div id="mainView">
+    <div class="task-list" id="taskList"></div>
+
+    <div class="input-row" id="inputRow">
+      <input
+        class="task-input"
+        id="taskInput"
+        placeholder="Aggiungi obiettivo…"
+        maxlength="120"
+        autocomplete="off"
+      />
+      <button class="add-btn" id="addBtn">+</button>
+    </div>
+  </div>
+
+  <div class="done-screen" id="doneScreen">
+    <div class="done-icon">✦</div>
+    <div class="done-title">Tutto completato</div>
+    <div class="done-sub">A domani</div>
+  </div>
+</div>
+
+<script>
+  const KEY = 'daily_goals_v1';
+
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      const data = raw ? JSON.parse(raw) : {};
+      if (data.date !== todayStr()) return { date: todayStr(), tasks: [] };
+      return data;
+    } catch { return { date: todayStr(), tasks: [] }; }
+  }
+
+  function save(data) { localStorage.setItem(KEY, JSON.stringify(data)); }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fmtDate(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    const months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+    const days = ['dom','lun','mar','mer','gio','ven','sab'];
+    const day = days[new Date(y, m-1, d).getDay()];
+    return `${day} ${d} ${months[m-1]} ${y}`;
+  }
+
+  function allDone(tasks) {
+    return tasks.length > 0 && tasks.every(t => t.done);
+  }
+
+  function render() {
+    const data = load();
+
+    document.getElementById('dateLabel').textContent = fmtDate(data.date);
+
+    const done = data.tasks.filter(t => t.done).length;
+    const total = data.tasks.length;
+    document.getElementById('progressLabel').textContent = total > 0 ? `${done} / ${total}` : '';
+
+    const list = document.getElementById('taskList');
+    list.innerHTML = '';
+
+    if (data.tasks.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.textContent = 'Nessun obiettivo — aggiungine uno';
+      list.appendChild(empty);
+    } else {
+      data.tasks.forEach((task, i) => {
+        const el = document.createElement('div');
+        el.className = 'task-item' + (task.done ? ' done' : '');
+        el.innerHTML = `
+          <div class="circle">
+            <svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"
+              stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1.5,5 4,7.5 8.5,2"/>
+            </svg>
+          </div>
+          <span class="task-text">${esc(task.text)}</span>
+        `;
+        el.addEventListener('click', () => toggle(i));
+        list.appendChild(el);
+      });
+    }
+
+    document.getElementById('inputRow').style.display = allDone(data.tasks) ? 'none' : 'flex';
+    document.getElementById('doneScreen').classList.remove('visible');
+    document.getElementById('mainView').style.display = 'block';
+    document.getElementById('mainView').style.opacity = '1';
+  }
+
+  function addTask() {
+    const input = document.getElementById('taskInput');
+    const text = input.value.trim();
+    if (!text) return;
+    const data = load();
+    data.tasks.push({ text, done: false });
+    save(data);
+    input.value = '';
+    render();
+    input.focus();
+  }
+
+  function toggle(index) {
+    const data = load();
+    data.tasks[index].done = !data.tasks[index].done;
+    save(data);
+
+    if (allDone(data.tasks)) {
+      render();
+      startCompletionFlow();
+    } else {
+      render();
+    }
+  }
+
+  function startCompletionFlow() {
+    const mainView = document.getElementById('mainView');
+
+    setTimeout(() => {
+      mainView.classList.add('fading');
+      mainView.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      mainView.style.opacity = '0';
+      mainView.style.transform = 'translateY(-6px)';
+
+      setTimeout(() => {
+        mainView.style.display = 'none';
+        mainView.style.opacity = '';
+        mainView.style.transform = '';
+
+        document.getElementById('doneScreen').classList.add('visible');
+
+        setTimeout(() => {
+          const data = load();
+          data.tasks = [];
+          save(data);
+
+          document.getElementById('doneScreen').classList.remove('visible');
+          mainView.classList.remove('fading');
+          render();
+          document.getElementById('taskInput').focus();
+        }, 2800);
+      }, 420);
+    }, 700);
+  }
+
+  document.getElementById('addBtn').addEventListener('click', addTask);
+  document.getElementById('taskInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTask();
+  });
+
+  render();
+</script>
+</body>
+</html>
